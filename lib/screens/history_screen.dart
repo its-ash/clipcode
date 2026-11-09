@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:theme/theme.dart';
 
 import '../models/otp_entry.dart';
@@ -31,7 +30,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
   Future<void> _load() async {
     setState(() => _loading = true);
-    final entries = await HistoryRepository.instance.fetchRecent(query: _searchController.text);
+    final entries = await HistoryRepository.instance.fetchRecent(
+      query: _searchController.text,
+    );
     if (!mounted) return;
     setState(() {
       _entries = entries;
@@ -52,23 +53,24 @@ class _HistoryScreenState extends State<HistoryScreen> {
         children: [
           Padding(
             padding: const EdgeInsets.all(16),
-            child: ThemeSearchBar(
+            child: UiSearchField(
               controller: _searchController,
-              hintText: 'Search by sender or code',
+              hint: 'Search by sender or code',
               onChanged: (_) => _load(),
-              onFilterTap: _load,
+              onFilter: _load,
             ),
           ),
           Expanded(
             child: _loading
                 ? const Center(child: CircularProgressIndicator())
                 : _entries.isEmpty
-                ? ThemeEmptyState(
+                ? const UiEmptyState(
                     title: 'No codes captured yet',
-                    subtitle: 'Codes detected in the last 24 hours will appear here',
+                    message:
+                        'Codes detected in the last 24 hours will appear here',
                     icon: Icons.inbox_outlined,
                   )
-                : RefreshIndicator(
+                : UiRefresh(
                     onRefresh: _load,
                     child: ListView.separated(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -76,21 +78,22 @@ class _HistoryScreenState extends State<HistoryScreen> {
                       separatorBuilder: (_, _) => const SizedBox(height: 8),
                       itemBuilder: (context, index) {
                         final entry = _entries[index];
-                        return ThemeCard(
-                          child: ThemeListTile(
+                        return UiCard(
+                          padding: EdgeInsets.zero,
+                          child: UiListTile(
+                            entry.code,
                             leading: Icon(
-                              entry.source == 'sms' ? Icons.sms_outlined : Icons.notifications_outlined,
+                              entry.source == 'sms'
+                                  ? Icons.sms_outlined
+                                  : Icons.notifications_outlined,
                             ),
-                            title: entry.code,
-                            subtitle: '${entry.sender} · ${_formatTime(entry.timestamp)}',
-                            trailing: IconButton(
-                              icon: const Icon(Icons.copy_outlined),
-                              onPressed: () async {
-                                await Clipboard.setData(ClipboardData(text: entry.code));
+                            subtitle:
+                                '${entry.sender} · ${_formatTime(entry.timestamp)}',
+                            trailing: UiCopyButton(
+                              entry.code,
+                              onCopied: () {
                                 if (context.mounted) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(content: Text('Code copied')),
-                                  );
+                                  context.showSnack('Code copied');
                                 }
                               },
                             ),

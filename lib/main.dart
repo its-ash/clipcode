@@ -13,13 +13,10 @@ class SnapOtpApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const UiApp(
       title: 'SnapOTP',
-      debugShowCheckedModeBanner: false,
-      theme: AppTheme.lightTheme(),
-      darkTheme: AppTheme.darkTheme(),
       themeMode: ThemeMode.system,
-      home: const DashboardScreen(),
+      home: DashboardScreen(),
     );
   }
 }

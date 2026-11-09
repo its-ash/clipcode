@@ -10,7 +10,8 @@ class PermissionsScreen extends StatefulWidget {
   State<PermissionsScreen> createState() => _PermissionsScreenState();
 }
 
-class _PermissionsScreenState extends State<PermissionsScreen> with WidgetsBindingObserver {
+class _PermissionsScreenState extends State<PermissionsScreen>
+    with WidgetsBindingObserver {
   bool _notificationAccess = false;
   bool _overlayGranted = false;
   bool _smsGranted = false;
@@ -35,7 +36,8 @@ class _PermissionsScreenState extends State<PermissionsScreen> with WidgetsBindi
   }
 
   Future<void> _refresh() async {
-    final notif = await PermissionService.instance.isNotificationAccessGranted();
+    final notif = await PermissionService.instance
+        .isNotificationAccessGranted();
     final overlay = await PermissionService.instance.isOverlayGranted();
     final sms = await PermissionService.instance.isSmsGranted();
     if (!mounted) return;
@@ -53,7 +55,7 @@ class _PermissionsScreenState extends State<PermissionsScreen> with WidgetsBindi
       appBar: AppBar(title: const Text('Permissions')),
       body: _loading
           ? const Center(child: CircularProgressIndicator())
-          : RefreshIndicator(
+          : UiRefresh(
               onRefresh: _refresh,
               child: ListView(
                 padding: const EdgeInsets.all(16),
@@ -61,10 +63,12 @@ class _PermissionsScreenState extends State<PermissionsScreen> with WidgetsBindi
                   _PermissionCard(
                     icon: Icons.notifications_active_outlined,
                     title: 'Notification Access',
-                    description: 'Required to read incoming notifications and detect OTP codes.',
+                    description:
+                        'Required to read incoming notifications and detect OTP codes.',
                     granted: _notificationAccess,
                     onTap: () async {
-                      await PermissionService.instance.openNotificationAccessSettings();
+                      await PermissionService.instance
+                          .openNotificationAccessSettings();
                       _refresh();
                     },
                   ),
@@ -72,7 +76,8 @@ class _PermissionsScreenState extends State<PermissionsScreen> with WidgetsBindi
                   _PermissionCard(
                     icon: Icons.picture_in_picture_alt_outlined,
                     title: 'Draw Over Other Apps',
-                    description: 'Required to show the floating OTP overlay banner.',
+                    description:
+                        'Required to show the floating OTP overlay banner.',
                     granted: _overlayGranted,
                     onTap: () async {
                       await PermissionService.instance.openOverlaySettings();
@@ -83,7 +88,8 @@ class _PermissionsScreenState extends State<PermissionsScreen> with WidgetsBindi
                   _PermissionCard(
                     icon: Icons.sms_outlined,
                     title: 'SMS Access',
-                    description: 'Required to read incoming SMS messages for OTP codes.',
+                    description:
+                        'Required to read incoming SMS messages for OTP codes.',
                     granted: _smsGranted,
                     onTap: () async {
                       await PermissionService.instance.requestSms();
@@ -114,44 +120,30 @@ class _PermissionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    return ThemeCard(
-      child: InkWell(
-        onTap: granted ? null : onTap,
-        borderRadius: BorderRadius.circular(16),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  color: scheme.primary.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Icon(icon, color: scheme.primary),
-              ),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(title, style: Theme.of(context).textTheme.titleSmall),
-                    const SizedBox(height: 4),
-                    Text(description, style: Theme.of(context).textTheme.bodySmall),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 8),
-              ThemeStatusPill(
-                label: granted ? 'Granted' : 'Grant',
-                status: granted ? ThemeStatus.success : ThemeStatus.warning,
-              ),
-            ],
+    final text = context.text;
+    return UiCard(
+      onTap: granted ? null : onTap,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          UiIconBox(icon, size: 44),
+          const UiGap(14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title, style: text.titleSmall),
+                const UiGap(UiSpace.xs),
+                Text(description, style: text.bodySmall),
+              ],
+            ),
           ),
-        ),
+          const UiGap(UiSpace.sm),
+          UiStatusPill(
+            granted ? 'Granted' : 'Grant',
+            status: granted ? UiStatus.success : UiStatus.warning,
+          ),
+        ],
       ),
     );
   }

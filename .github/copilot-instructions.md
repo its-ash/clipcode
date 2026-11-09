@@ -73,6 +73,8 @@ runtime permission requested via `permission_handler`.
 
 - minSdk 26, targetSdk/compileSdk 34.
 - No analytics/telemetry dependencies, ever. No network permissions.
-- Theme: consume `AppTheme.lightTheme()` / `AppTheme.darkTheme()` and the
-  `Theme*` component widgets from the `theme` package instead of raw
-  Material widgets where an equivalent exists.
+- Theme: the app is wrapped in `UiApp` (theme v2). Use the `Ui*` component
+  widgets from `package:theme/theme.dart` instead of raw Material widgets
+  where an equivalent exists (see `../theme/COMPONENTS.md`). Read colors from
+  `context.colors` (status colors via `context.colors.tone(UiStatus.x)`) and
+  text styles from `context.text`; never hardcode colors.
