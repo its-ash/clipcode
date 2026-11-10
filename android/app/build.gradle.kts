@@ -6,7 +6,7 @@ plugins {
 
 android {
     namespace = "com.itsash.clipotp.clipotp"
-    compileSdk = 34
+    compileSdk = 36
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
