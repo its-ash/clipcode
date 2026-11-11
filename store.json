@@ -1,11 +1,11 @@
 {
-  "id": "snapotp",
-  "name": "SnapOTP",
-  "repo": "its-ash/snapotp",
+  "id": "clipcode",
+  "name": "Clipcode",
+  "repo": "its-ash/clipcode",
   "package": "com.itsash.clipotp.clipotp",
   "tagline": "One-tap copy for OTP codes from SMS and notifications.",
-  "description": "SnapOTP spots one-time codes in incoming SMS and notifications and shows a small floating pill so you can copy the code with one tap. Everything happens on your phone: no network calls and no telemetry. Code history is kept for 24 hours only.",
+  "description": "Clipcode spots one-time codes in incoming SMS and notifications and shows a small floating pill so you can copy the code with one tap. Everything happens on your phone: no network calls and no telemetry. Code history is kept for 24 hours only.",
   "category": "Utilities",
   "icon": "assets/icon/logo-1024.png",
-  "homepage": "https://snapotp.itsash.in/"
+  "homepage": "https://clipcode.itsash.in/"
 }

@@ -179,7 +179,7 @@ class SnapOverlayService : Service() {
         // Flutter engine) so copy works even if the Flutter engine is not
         // running.
         val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-        val clip = ClipData.newPlainText("SnapOTP code", code)
+        val clip = ClipData.newPlainText("Clipcode code", code)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             // Hides the code in the system clipboard preview.
             clip.description.extras = PersistableBundle().apply {

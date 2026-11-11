@@ -107,7 +107,7 @@ class _DashboardScreenState extends State<DashboardScreen>
     final text = context.text;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('SnapOTP')),
+      appBar: AppBar(title: const Text('Clipcode')),
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : UiRefresh(

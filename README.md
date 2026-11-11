@@ -1,8 +1,8 @@
-# SnapOTP
+# Clipcode
 
 One-tap copy for OTP codes from SMS and notifications.
 
-**[Website](https://snapotp.itsash.in)** · **[Download APK](https://github.com/its-ash/snapotp/releases/latest/download/snapotp.apk)** · Get it in **[Ash Store](https://store.itsash.in)**
+**[Website](https://clipcode.itsash.in)** · **[Download APK](https://github.com/its-ash/clipcode/releases/latest/download/clipcode.apk)** · Get it in **[Ash Store](https://store.itsash.in)**
 
 ## Features
 
@@ -18,8 +18,8 @@ One-tap copy for OTP codes from SMS and notifications.
 
 ## Install
 
-- **Ash Store**: install [Ash Store](https://store.itsash.in) once, then install and update SnapOTP from it.
-- **APK**: download the [latest APK](https://github.com/its-ash/snapotp/releases/latest/download/snapotp.apk) on your phone and open it. Allow your browser to install unknown apps if Android asks.
+- **Ash Store**: install [Ash Store](https://store.itsash.in) once, then install and update Clipcode from it.
+- **APK**: download the [latest APK](https://github.com/its-ash/clipcode/releases/latest/download/clipcode.apk) on your phone and open it. Allow your browser to install unknown apps if Android asks.
 
 Requires Android 8.0 (API 26) or later. After install, grant notification
 access, SMS and "display over other apps" from the app's permission screen.
@@ -38,7 +38,7 @@ make deploy   # bump version, build, tag, push, GitHub release (see store.mk)
 
 `make deploy` follows the Ash Store kit (`store.mk`, `store.json`): it bumps the
 version in `pubspec.yaml`, builds, commits, tags `vX.Y.Z`, pushes, and publishes
-a GitHub release with `snapotp.apk`. Ash Store and the website pick up the new
+a GitHub release with `clipcode.apk`. Ash Store and the website pick up the new
 version from that release.
 
 ## Project layout

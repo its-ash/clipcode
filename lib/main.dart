@@ -5,16 +5,16 @@ import 'screens/dashboard_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(const SnapOtpApp());
+  runApp(const ClipcodeApp());
 }
 
-class SnapOtpApp extends StatelessWidget {
-  const SnapOtpApp({super.key});
+class ClipcodeApp extends StatelessWidget {
+  const ClipcodeApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return const UiApp(
-      title: 'SnapOTP',
+      title: 'Clipcode',
       themeMode: ThemeMode.system,
       home: DashboardScreen(),
     );

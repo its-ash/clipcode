@@ -1,4 +1,9 @@
-# SnapOTP (package: ClipOTP / com.itsash.clipotp.clipotp)
+# Clipcode (formerly SnapOTP; Dart package clipotp / com.itsash.clipotp.clipotp)
+
+The folder, Dart package, Kotlin class names (`Snap*`), DB file
+`snapotp_history.db` and prefs file `snapotp_prefs` keep their old names on
+purpose: renaming persisted files would lose user data, and the package id must
+stay so existing installs update.
 
 Privacy-focused Android app: Flutter UI shell + native Kotlin platform code
 that intercepts notifications and SMS to detect OTPs, extracts codes, and
@@ -96,6 +101,6 @@ runtime permission requested via `permission_handler`.
   text styles from `context.text`; never hardcode colors.
 
 ## Release (Ash Store)
-- Published through the Ash Store kit: `store.json` (id `snapotp`, repo its-ash/snapotp), `store.mk`, `index.html` + `CNAME` (`snapotp.itsash.in`). See `../ash-store/store-kit/STORE.md`.
-- `make deploy` = bump version → build → commit, tag `vX.Y.Z`, push → GitHub release with `snapotp.apk` → repo topics, homepage, Pages. Never create releases, tags or asset names by hand.
+- Published through the Ash Store kit: `store.json` (id `clipcode`, repo its-ash/clipcode), `store.mk`, `index.html` + `CNAME` (`clipcode.itsash.in`). See `../ash-store/store-kit/STORE.md`.
+- `make deploy` = bump version → build → commit, tag `vX.Y.Z`, push → GitHub release with `clipcode.apk` → repo topics, homepage, Pages. Never create releases, tags or asset names by hand.
 - Do not edit `store.mk` here. Edit `../ash-store/store-kit/store.mk`, then run `make store-sync` at the workspace root.

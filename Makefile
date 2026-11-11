@@ -1,4 +1,4 @@
-STORE_ID := snapotp
+STORE_ID := clipcode
 
 .PHONY: run build clean
 

@@ -1,4 +1,4 @@
-# SnapOTP (package: ClipOTP / com.itsash.clipotp.clipotp)
+# Clipcode (formerly SnapOTP; package: clipotp / com.itsash.clipotp.clipotp)
 
 Privacy-focused Android app: Flutter UI shell + native Kotlin platform code
 that intercepts notifications and SMS to detect OTPs, extracts codes, and
