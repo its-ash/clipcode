@@ -12,7 +12,6 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  bool _autoCopy = true;
   double _timeoutSec = 10;
   Map<AppCategory, bool> _categories = {};
   bool _loading = true;
@@ -24,13 +23,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<void> _load() async {
-    final autoCopy = await PlatformChannelService.instance.getAutoCopy();
     final timeout = await PlatformChannelService.instance
         .getOverlayTimeoutSec();
     final categories = await SettingsRepository.instance.loadCategoryToggles();
     if (!mounted) return;
     setState(() {
-      _autoCopy = autoCopy;
       _timeoutSec = timeout.toDouble().clamp(5, 30);
       _categories = categories;
       _loading = false;
@@ -48,26 +45,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
               padding: const EdgeInsets.all(16),
               children: [
                 UiCard(
-                  padding: EdgeInsets.zero,
-                  child: UiSwitchTile(
-                    'Auto-copy to clipboard',
-                    subtitle: 'Copy the OTP as soon as it is detected',
-                    value: _autoCopy,
-                    onChanged: (value) async {
-                      setState(() => _autoCopy = value);
-                      await PlatformChannelService.instance.setAutoCopy(value);
-                    },
-                  ),
-                ),
-                const SizedBox(height: 16),
-                UiCard(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text('Overlay timeout', style: text.titleSmall),
                       const UiGap(UiSpace.xs),
                       Text(
-                        '${_timeoutSec.round()} seconds before the banner auto-dismisses',
+                        '${_timeoutSec.round()} seconds before the pop-up hides. Tap Copy on the pop-up to copy the code.',
                         style: text.bodySmall,
                       ),
                       UiSlider(
@@ -114,6 +98,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     }).toList(),
                   ),
                 ),
+                const SizedBox(height: 16),
+                // No network permission: the row opens the latest APK download in the browser.
+                const UiUpdateSection(storeId: 'snapotp', checkForUpdates: false),
+                const SizedBox(height: 16),
+                const UiDeveloperSection(),
               ],
             ),
     );

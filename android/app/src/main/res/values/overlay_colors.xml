@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- OTP pop-up colors, copied from the shared theme's light palette
+     (theme/lib/src/foundation/ui_colors.dart). Dark values in values-night/. -->
+<resources>
+    <color name="overlay_surface">#FFFFFF</color>
+    <color name="overlay_border">#E4E4E9</color>
+    <color name="overlay_text">#111114</color>
+    <color name="overlay_text_muted">#55555F</color>
+    <color name="overlay_accent">#4F46E5</color>
+    <color name="overlay_on_accent">#FFFFFF</color>
+    <color name="overlay_accent_soft">#EEEDFC</color>
+</resources>

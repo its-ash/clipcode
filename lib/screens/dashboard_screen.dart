@@ -59,6 +59,43 @@ class _DashboardScreenState extends State<DashboardScreen>
   bool get _allPermissionsGranted =>
       _notificationAccess && _overlayGranted && _smsGranted;
 
+  bool _trying = false;
+
+  /// Shows the pop-up for the newest OTP in the SMS inbox.
+  Future<void> _tryPopup() async {
+    setState(() => _trying = true);
+    try {
+      var status = await PlatformChannelService.instance.showLastOtp();
+      if (status == 'no_sms_permission' &&
+          await PermissionService.instance.requestSms()) {
+        status = await PlatformChannelService.instance.showLastOtp();
+      }
+      if (!mounted) return;
+      switch (status) {
+        case 'shown':
+          break;
+        case 'no_sms_permission':
+          context.showToast(
+            'Allow SMS access to read your last code.',
+            status: UiStatus.warning,
+          );
+        case 'no_overlay_permission':
+          context.showToast(
+            'Allow "Display over other apps" to show the pop-up.',
+            status: UiStatus.warning,
+          );
+          await PermissionService.instance.openOverlaySettings();
+        default:
+          context.showToast(
+            'No OTP found in your recent messages.',
+            status: UiStatus.info,
+          );
+      }
+    } finally {
+      if (mounted) setState(() => _trying = false);
+    }
+  }
+
   Future<void> _toggleMaster(bool value) async {
     setState(() => _masterEnabled = value);
     await PlatformChannelService.instance.setMasterEnabled(value);
@@ -126,6 +163,29 @@ class _DashboardScreenState extends State<DashboardScreen>
                         ),
                       ),
                     ),
+                  const SizedBox(height: 16),
+                  UiCard(
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Try it', style: text.titleMedium),
+                        const UiGap(UiSpace.xs),
+                        Text(
+                          'Shows the pop-up for the last code in your messages.',
+                          style: text.bodySmall,
+                        ),
+                        const UiGap(UiSpace.md),
+                        UiButton(
+                          'Show last OTP',
+                          icon: Icons.play_arrow_rounded,
+                          expand: true,
+                          loading: _trying,
+                          onPressed: _tryPopup,
+                        ),
+                      ],
+                    ),
+                  ),
                   const SizedBox(height: 16),
                   const UiSectionHeader('Quick actions'),
                   const SizedBox(height: 8),

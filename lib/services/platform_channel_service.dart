@@ -24,11 +24,10 @@ class PlatformChannelService {
   Future<void> setMasterEnabled(bool enabled) =>
       _control.invokeMethod('setMasterEnabled', {'enabled': enabled});
 
-  Future<bool> getAutoCopy() async =>
-      (await _control.invokeMethod<bool>('getAutoCopy')) ?? true;
-
-  Future<void> setAutoCopy(bool enabled) =>
-      _control.invokeMethod('setAutoCopy', {'enabled': enabled});
+  /// Shows the pop-up for the newest OTP in the SMS inbox. Returns `shown`,
+  /// `no_sms_permission`, `no_overlay_permission` or `not_found`.
+  Future<String> showLastOtp() async =>
+      (await _control.invokeMethod<String>('showLastOtp')) ?? 'not_found';
 
   Future<int> getOverlayTimeoutSec() async =>
       (await _control.invokeMethod<int>('getOverlayTimeoutSec')) ?? 10;

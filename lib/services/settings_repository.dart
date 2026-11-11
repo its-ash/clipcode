@@ -17,7 +17,7 @@ extension AppCategoryLabel on AppCategory {
 }
 
 /// Local (Dart-only) preferences that don't need to be read by native code:
-/// category whitelist. Master toggle / auto-copy / overlay timeout live in
+/// category whitelist. Master toggle / overlay timeout live in
 /// the native-shared prefs via PlatformChannelService instead.
 class SettingsRepository {
   SettingsRepository._();

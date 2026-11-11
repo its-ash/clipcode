@@ -16,10 +16,11 @@ data class OtpMatch(val code: String, val sender: String)
  */
 object OtpExtractor {
 
-    private val KEYWORDS = listOf(
-        "otp", "one-time password", "one time password", "code", "verification",
-        "verify", "passcode", "pass code", "secret", "authentication", "auth code",
-        "security code", "login code", "access code", "pin",
+    // Whole words only: "pin" must not match "shopping", nor "code" match "decode".
+    private val KEYWORD = Pattern.compile(
+        "\\b(otp|one[- ]time pass(word|code)?|codes?|verification|verify|passcode|pass code|" +
+            "secret|authentication|auth code|security code|login code|access code|pin)\\b",
+        Pattern.CASE_INSENSITIVE,
     )
 
     // 4-8 digits, or 4-8 alphanumeric with at least one digit (mixed codes like "A3F9K2").
@@ -32,32 +33,32 @@ object OtpExtractor {
         "\\b\\d{1,2}[/-]\\d{1,2}[/-]\\d{2,4}\\b|\\b\\d{4}[/-]\\d{1,2}[/-]\\d{1,2}\\b",
     )
     private val ORDER_ID_NEARBY = Pattern.compile("\\b(order|awb|tracking|invoice|ref(erence)?)\\b\\s*(id|no\\.?|#)?", Pattern.CASE_INSENSITIVE)
-    private val PHONE_LIKE = Pattern.compile("\\b\\d{10,}\\b")
 
     private const val KEYWORD_WINDOW = 40
 
     /**
      * Attempts to extract an OTP code from [text]. [sender] is the SMS
      * originating address or the notification's app/title label.
+     *
+     * With [requireKeyword] a code counts only next to an OTP keyword. Use it
+     * for notifications, which come from every app: a bare 6-digit number in
+     * a music, fitness or shopping notification is not an OTP.
      */
-    fun extract(text: String, sender: String): OtpMatch? {
+    fun extract(text: String, sender: String, requireKeyword: Boolean = false): OtpMatch? {
         if (text.isBlank()) return null
         val normalized = text.trim()
         val lower = normalized.lowercase(Locale.US)
-
-        if (PHONE_LIKE.matcher(normalized).find() && !hasNearbyKeyword(lower, PHONE_LIKE, normalized)) {
-            // long digit runs without a keyword nearby are likely phone numbers; keep scanning
-            // shorter runs below rather than bailing out entirely.
-        }
 
         val candidates = mutableListOf<Pair<String, Int>>()
         collectMatches(NUMERIC_CODE, normalized, candidates)
         collectMatches(ALPHANUMERIC_CODE, normalized.uppercase(Locale.US), candidates)
 
-        for ((code, index) in candidates.sortedByDescending { it.second == it.second }) {
+        for ((code, index) in candidates) {
+            // A code needs a digit: plain words like "YOUR" or "CODE" are not codes.
+            if (code.none { it.isDigit() }) continue
             if (isExcluded(normalized, lower, code, index)) continue
             val hasKeyword = hasKeywordNear(lower, index)
-            val looksStrict = looksStrictCode(code)
+            val looksStrict = !requireKeyword && looksStrictCode(code)
             if (hasKeyword || looksStrict) {
                 return OtpMatch(code = code, sender = sender.ifBlank { "Unknown" })
             }
@@ -72,17 +73,12 @@ object OtpExtractor {
         }
     }
 
-    private fun hasNearbyKeyword(lower: String, pattern: Pattern, original: String): Boolean {
-        val matcher = pattern.matcher(original)
-        if (!matcher.find()) return false
-        return hasKeywordNear(lower, matcher.start())
-    }
-
     private fun hasKeywordNear(lower: String, index: Int): Boolean {
         val start = (index - KEYWORD_WINDOW).coerceAtLeast(0)
         val end = (index + KEYWORD_WINDOW).coerceAtMost(lower.length)
-        val window = lower.substring(start, end)
-        return KEYWORDS.any { window.contains(it) }
+        // Transparent bounds: \b sees the text around the window, so a word cut
+        // at the window edge ("s|pin") is not taken for a keyword.
+        return KEYWORD.matcher(lower).region(start, end).useTransparentBounds(true).find()
     }
 
     /** A code is "strict" if it mixes letters and digits, or is exactly 6 digits (the most common OTP length). */

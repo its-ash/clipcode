@@ -16,17 +16,32 @@ telemetry.
   - `SnapSmsReceiver.kt` — `BroadcastReceiver` for
     `android.provider.Telephony.SMS_RECEIVED`; same extraction/overlay path.
   - `OtpExtractor.kt` — regex/heuristic engine. 4-8 char numeric or
-    alphanumeric codes; requires an OTP keyword within ~40 chars OR a
-    "strict" code shape (mixed alnum, or exactly 6 digits). Excludes
+    alphanumeric codes (always with a digit); requires an OTP keyword
+    (whole word) within ~40 chars OR a "strict" code shape (mixed alnum, or
+    exactly 6 digits). Notifications pass `requireKeyword = true`: a strict
+    shape alone counts only for SMS. Excludes
     currency-adjacent, date-shaped, phone-number-length (10+), and
     order/tracking-id-adjacent matches unless a keyword is nearby.
   - `SnapOverlayService.kt` — `WindowManager` + `TYPE_APPLICATION_OVERLAY`
-    pill UI (`res/layout/view_otp_overlay.xml`). Clipboard writes happen
-    **natively here**, never routed through the Flutter engine, so copy
-    works even when the Flutter engine isn't running. Auto-dismisses after
-    a configurable timeout (default 10s) or immediately after copy. Add/
-    remove of the overlay view is lifecycle-safe (single tracked view,
-    always removed in `onDestroy`).
+    pop-up (`res/layout/view_otp_overlay.xml`): a full-width card at the
+    top, styled like a heads-up notification, with a Copy button. Colors
+    come from the shared theme palette, copied into
+    `res/values{,-night}/overlay_colors.xml` (keep them in sync with
+    `theme/lib/src/foundation/ui_colors.dart`). The code is copied **only
+    when the user taps Copy** (no auto-copy), natively, never through the
+    Flutter engine, and marked sensitive on Android 13+. Hides after a
+    configurable timeout (default 10s), on swipe/close, or shortly after
+    copy. Add/remove of the overlay view is lifecycle-safe (single tracked
+    view, always removed in `onDestroy`).
+  - Duplicates: one OTP arrives several times (SMS broadcast, then the
+    messaging app's notification and its updates). `SnapPrefs.claimNewCode`
+    drops any code already seen in the last 15 min (it remembers every
+    recent code, not just the last), so it shows once and gets one
+    history row. Group-summary notifications are skipped.
+  - Only new messages pop up: the listener skips ongoing / foreground-service
+    notifications and any whose message time (`Notification.when`, else
+    `postTime`) is over 2 min old, so apps re-posting old notifications
+    (e.g. on open or sync) do not re-show an OTP.
   - `SnapDb.kt` — `SQLiteOpenHelper` for the 24h rolling OTP history table
     (`otp_history`). **Shared file contract**: both this Kotlin helper
     (`context.getDatabasePath("snapotp_history.db")`) and Flutter's sqflite
@@ -41,10 +56,11 @@ telemetry.
 ## Platform channel contract
 
 - `MethodChannel("com.itsash.clipotp/control")`: `getMasterEnabled`,
-  `setMasterEnabled`, `getAutoCopy`, `setAutoCopy`, `getOverlayTimeoutSec`,
+  `setMasterEnabled`, `getOverlayTimeoutSec`,
   `setOverlayTimeoutSec`, `isNotificationAccessGranted`,
   `isOverlayPermissionGranted`, `openNotificationAccessSettings`,
-  `openOverlayPermissionSettings`. Backed by Android `SharedPreferences`
+  `openOverlayPermissionSettings`, `showLastOtp` (dashboard "Try it"
+  button: newest OTP in the SMS inbox → pop-up; no history row). Backed by Android `SharedPreferences`
   (`SnapPrefs`, file `snapotp_prefs`) so native services read the same
   values Flutter writes.
 - `EventChannel("com.itsash.clipotp/events")`: reserved for live-forwarding

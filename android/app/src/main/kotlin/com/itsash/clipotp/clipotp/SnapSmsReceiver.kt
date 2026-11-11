@@ -28,6 +28,7 @@ class SnapSmsReceiver : BroadcastReceiver() {
 
         val match = OtpExtractor.extract(body, sender) ?: return
         val appContext = context.applicationContext
+        if (!SnapPrefs.claimNewCode(appContext, match.code)) return
 
         SnapDbHelper(appContext).insert(
             sender = sender,
