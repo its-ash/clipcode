@@ -15,7 +15,6 @@ class ClipcodeApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const UiApp(
       title: 'Clipcode',
-      themeMode: ThemeMode.system,
       home: DashboardScreen(),
     );
   }

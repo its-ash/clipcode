@@ -99,6 +99,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                 ),
                 const SizedBox(height: 16),
+                const UiAppearanceSection(),
+                const SizedBox(height: 16),
                 // No network permission: the row opens the latest APK download in the browser.
                 const UiUpdateSection(storeId: 'clipcode', checkForUpdates: false),
                 const SizedBox(height: 16),
