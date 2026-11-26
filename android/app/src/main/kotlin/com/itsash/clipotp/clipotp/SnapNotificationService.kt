@@ -35,7 +35,7 @@ class SnapNotificationService : NotificationListenerService() {
         val title = extras.getCharSequence("android.title")?.toString().orEmpty()
         val text = extras.getCharSequence("android.text")?.toString().orEmpty()
         val bigText = extras.getCharSequence("android.bigText")?.toString().orEmpty()
-        val body = listOf(text, bigText).firstOrNull { it.isNotBlank() } ?: text
+        val body = bigText.ifBlank { text }
         val combined = "$title $body".trim()
         if (combined.isBlank()) return
 
@@ -50,7 +50,7 @@ class SnapNotificationService : NotificationListenerService() {
         val match = OtpExtractor.extract(combined, appLabel, requireKeyword = true) ?: return
         if (!SnapPrefs.claimNewCode(applicationContext, match.code)) return
 
-        SnapDbHelper(applicationContext).insert(
+        SnapDbHelper.getInstance(applicationContext).insert(
             sender = appLabel,
             code = match.code,
             source = "notification",
@@ -63,7 +63,7 @@ class SnapNotificationService : NotificationListenerService() {
                 putExtra(SnapOverlayService.EXTRA_CODE, match.code)
                 putExtra(SnapOverlayService.EXTRA_SENDER, appLabel)
             }
-            applicationContext.startService(overlayIntent)
+            runCatching { applicationContext.startService(overlayIntent) }
         }
     }
 

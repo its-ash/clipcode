@@ -21,12 +21,20 @@ class HistoryRepository {
   static const _retention = Duration(hours: 24);
 
   Database? _db;
+  Future<Database>? _opening;
 
-  Future<Database> _open() async {
-    if (_db != null) return _db!;
+  Future<Database> _open() {
+    if (_db != null) return Future.value(_db!);
+    return _opening ??= _openDb().then((db) {
+      _db = db;
+      return db;
+    }).whenComplete(() => _opening = null);
+  }
+
+  Future<Database> _openDb() async {
     final dir = await getDatabasesPath();
     final path = p.join(dir, _dbName);
-    _db = await openDatabase(
+    return openDatabase(
       path,
       version: 1,
       onCreate: (db, version) async {
@@ -43,7 +51,6 @@ class HistoryRepository {
         await db.execute('CREATE INDEX IF NOT EXISTS idx_otp_history_ts ON $_table(timestamp)');
       },
     );
-    return _db!;
   }
 
   Future<List<OtpEntry>> fetchRecent({String query = ''}) async {

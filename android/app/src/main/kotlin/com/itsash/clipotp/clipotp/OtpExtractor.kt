@@ -28,7 +28,8 @@ object OtpExtractor {
     private val ALPHANUMERIC_CODE = Pattern.compile("\\b([A-Z0-9]{4,8})\\b")
 
     // Exclusions: currency, dates, phone-like runs, order/tracking ids.
-    private val CURRENCY_NEARBY = Pattern.compile("[$₹€£]\\s?\\d|\\d\\s?(usd|inr|eur|gbp)", Pattern.CASE_INSENSITIVE)
+    private val CURRENCY_BEFORE = Pattern.compile("[$₹€£]\\s*$")
+    private val CURRENCY_AFTER = Pattern.compile("^\\s*(usd|inr|eur|gbp)\\b", Pattern.CASE_INSENSITIVE)
     private val DATE_PATTERN = Pattern.compile(
         "\\b\\d{1,2}[/-]\\d{1,2}[/-]\\d{2,4}\\b|\\b\\d{4}[/-]\\d{1,2}[/-]\\d{1,2}\\b",
     )
@@ -90,12 +91,17 @@ object OtpExtractor {
     }
 
     private fun isExcluded(original: String, lower: String, code: String, index: Int): Boolean {
+        val safeIndex = index.coerceIn(0, lower.length)
+        val safeEnd = (index + code.length).coerceIn(safeIndex, lower.length)
+        val before = lower.substring(0, safeIndex)
+        val after = lower.substring(safeEnd)
+        if (CURRENCY_BEFORE.matcher(before).find() || CURRENCY_AFTER.matcher(after).find()) return true
+
         val start = (index - KEYWORD_WINDOW).coerceAtLeast(0)
         val end = (index + KEYWORD_WINDOW).coerceAtMost(original.length)
         val window = original.substring(start, end)
         val windowLower = lower.substring(start, end)
 
-        if (CURRENCY_NEARBY.matcher(windowLower).find()) return true
         if (DATE_PATTERN.matcher(window).find() && window.contains(code)) {
             // The code itself is part of a date-like token.
             if (DATE_PATTERN.matcher(code).find()) return true

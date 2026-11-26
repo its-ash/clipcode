@@ -110,13 +110,15 @@ class MainActivity : FlutterActivity() {
                 if (match == null) {
                     result.success("not_found")
                 } else {
-                    startService(
-                        Intent(applicationContext, SnapOverlayService::class.java).apply {
-                            putExtra(SnapOverlayService.EXTRA_CODE, match.code)
-                            putExtra(SnapOverlayService.EXTRA_SENDER, match.sender)
-                        },
-                    )
-                    result.success("shown")
+                    val started = runCatching {
+                        startService(
+                            Intent(applicationContext, SnapOverlayService::class.java).apply {
+                                putExtra(SnapOverlayService.EXTRA_CODE, match.code)
+                                putExtra(SnapOverlayService.EXTRA_SENDER, match.sender)
+                            },
+                        )
+                    }.isSuccess
+                    result.success(if (started) "shown" else "not_found")
                 }
             }
         }.start()

@@ -64,8 +64,8 @@ runtime permission requested via `permission_handler`.
 - `flutter pub get && flutter run` — run on a connected device/emulator.
 - `flutter build apk --release` — release APK.
 - `flutter analyze` — static analysis; keep clean.
-- Icon source: `assets/icon/icon.png` (+ `icon_fg.png` for the adaptive
-  foreground), generated from `Icons/shieldsdotio.svg` via `rsvg-convert`.
+- Icon source: `assets/icon/logo-1024.png` (+ `logo_background-1024.png` and
+  `logo_foreground-1024.png` for the adaptive icon).
   Regenerate launcher icons with `flutter pub run flutter_launcher_icons`
   after changing the source art.
 

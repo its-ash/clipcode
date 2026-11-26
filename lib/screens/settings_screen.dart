@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:theme/theme.dart';
 
 import '../services/platform_channel_service.dart';
-import '../services/settings_repository.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -13,7 +12,6 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreenState extends State<SettingsScreen> {
   double _timeoutSec = 10;
-  Map<AppCategory, bool> _categories = {};
   bool _loading = true;
 
   @override
@@ -25,11 +23,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Future<void> _load() async {
     final timeout = await PlatformChannelService.instance
         .getOverlayTimeoutSec();
-    final categories = await SettingsRepository.instance.loadCategoryToggles();
     if (!mounted) return;
     setState(() {
       _timeoutSec = timeout.toDouble().clamp(5, 30);
-      _categories = categories;
       _loading = false;
     });
   }
@@ -74,28 +70,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         ),
                       ),
                     ],
-                  ),
-                ),
-                const SizedBox(height: 16),
-                const UiSectionHeader('App categories'),
-                const SizedBox(height: 8),
-                UiCard(
-                  padding: EdgeInsets.zero,
-                  child: Column(
-                    children: AppCategory.values.map((category) {
-                      final enabled = _categories[category] ?? true;
-                      return UiSwitchTile(
-                        category.label,
-                        value: enabled,
-                        onChanged: (value) async {
-                          setState(() => _categories[category] = value);
-                          await SettingsRepository.instance.setCategoryEnabled(
-                            category,
-                            value,
-                          );
-                        },
-                      );
-                    }).toList(),
                   ),
                 ),
                 const SizedBox(height: 16),

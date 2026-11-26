@@ -30,7 +30,7 @@ class SnapSmsReceiver : BroadcastReceiver() {
         val appContext = context.applicationContext
         if (!SnapPrefs.claimNewCode(appContext, match.code)) return
 
-        SnapDbHelper(appContext).insert(
+        SnapDbHelper.getInstance(appContext).insert(
             sender = sender,
             code = match.code,
             source = "sms",
@@ -43,7 +43,7 @@ class SnapSmsReceiver : BroadcastReceiver() {
                 putExtra(SnapOverlayService.EXTRA_CODE, match.code)
                 putExtra(SnapOverlayService.EXTRA_SENDER, sender)
             }
-            appContext.startService(overlayIntent)
+            runCatching { appContext.startService(overlayIntent) }
         }
     }
 }

@@ -15,6 +15,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
   final _searchController = TextEditingController();
   List<OtpEntry> _entries = [];
   bool _loading = true;
+  int _seq = 0;
 
   @override
   void initState() {
@@ -29,15 +30,20 @@ class _HistoryScreenState extends State<HistoryScreen> {
   }
 
   Future<void> _load() async {
+    final seq = ++_seq;
     setState(() => _loading = true);
-    final entries = await HistoryRepository.instance.fetchRecent(
-      query: _searchController.text,
-    );
-    if (!mounted) return;
-    setState(() {
-      _entries = entries;
-      _loading = false;
-    });
+    try {
+      final entries = await HistoryRepository.instance.fetchRecent(
+        query: _searchController.text,
+      );
+      if (!mounted || seq != _seq) return;
+      setState(() => _entries = entries);
+    } catch (_) {
+    } finally {
+      if (mounted && seq == _seq) {
+        setState(() => _loading = false);
+      }
+    }
   }
 
   @override

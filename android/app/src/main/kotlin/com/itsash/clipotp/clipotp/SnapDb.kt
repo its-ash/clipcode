@@ -32,13 +32,23 @@ object SnapDbContract {
     const val RETENTION_MILLIS = 24L * 60L * 60L * 1000L
 }
 
-class SnapDbHelper(context: Context) :
+class SnapDbHelper private constructor(context: Context) :
     SQLiteOpenHelper(
         context,
         context.getDatabasePath(SnapDbContract.DB_NAME).absolutePath,
         null,
         SnapDbContract.DB_VERSION,
     ) {
+
+    companion object {
+        @Volatile
+        private var instance: SnapDbHelper? = null
+
+        fun getInstance(context: Context): SnapDbHelper =
+            instance ?: synchronized(this) {
+                instance ?: SnapDbHelper(context.applicationContext).also { instance = it }
+            }
+    }
 
     override fun onCreate(db: SQLiteDatabase) {
         db.execSQL(
